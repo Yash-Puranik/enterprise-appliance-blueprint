@@ -1,0 +1,61 @@
+# ==============================================================================
+# Version Control & Git Internals
+# Prevents bloat and history leakage into container layers
+# ==============================================================================
+.git
+.gitignore
+.gitattributes
+
+# ==============================================================================
+# CI/CD Workflows & Repository Documentation
+# Not needed inside runtime container images
+# ==============================================================================
+.github
+*.md
+LICENSE
+
+# ==============================================================================
+# Environment Configuration & Secrets
+# CRITICAL: Never bake actual secrets into an immutable image layer
+# ==============================================================================
+.env
+.env.*
+!.env.example
+
+# ==============================================================================
+# Disaster Recovery & Runtime Artifacts
+# Backups and execution logs should live on host/volumes, not in the image
+# ==============================================================================
+backups/
+*.sql
+*.sql.gz
+*.log
+logs/
+
+# ==============================================================================
+# Host Platform & Editor Metadata
+# Avoid OS-specific files polluting Linux filesystem layers
+# ==============================================================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ==============================================================================
+# Language-Specific Caches & Dependencies
+# Dependencies should be installed cleanly inside the container, not copied from host
+# ==============================================================================
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Temporary directories
+tmp/
+temp/
