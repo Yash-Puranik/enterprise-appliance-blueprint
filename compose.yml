@@ -53,7 +53,7 @@ volumes:
   postgres_data:
 
 networks:
-  internal-net:
+  internal_net:
     driver: bridge
 
 
