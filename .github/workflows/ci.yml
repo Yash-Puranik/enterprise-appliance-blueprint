@@ -1,0 +1,46 @@
+name: Appliance CI Pipeline
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_secure_password123
+      POSTGRES_DB: appliance_test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose Syntax
+        run: docker compose config
+
+      - name: Build Custom Services Image
+        run: docker compose build
+
+      - name: Start Appliance Stack
+        run: docker compose up -d
+
+      - name: Await database healthcheck
+        run: |
+          echo "Waiting for PostgreSQL container to become healthy..."
+          timeout 60 bash -c 'until [ "$(docker inspect --format "{{.State.Health.Status}}" $(docker compose ps -q db))" = "healthy" ]; do
+            echo "Health status: $(docker inspect --format "{{.State.Health.Status}}" $(docker compose ps -q db))"
+            sleep 2
+          done'
+          echo "Database is healthy and accepting connections."
+
+      - name: Verify running services
+        run: docker compose ps
+
+      - name: Teardown and clean up stack
+        if: always()
+        run: docker compose down -v
+
