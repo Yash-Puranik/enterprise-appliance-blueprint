@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "${SCRIPT_DIR}/.."
+
 if [ "$EUID" -ne 0 ]; then
     echo "Access denied: Please run as root user"
     exit 1
