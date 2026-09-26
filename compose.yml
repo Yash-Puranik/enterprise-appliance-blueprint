@@ -38,8 +38,8 @@ services:
 
   web:
     build:
-      context: ./services/web
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: services/web/Dockerfile
     image: appliance-web:local
     restart: unless-stopped
     ports:

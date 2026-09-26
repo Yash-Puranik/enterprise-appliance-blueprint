@@ -43,4 +43,4 @@ jobs:
       - name: Teardown and clean up stack
         if: always()
         run: docker compose down -v
-
+        

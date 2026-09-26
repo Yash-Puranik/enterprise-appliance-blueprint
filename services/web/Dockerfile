@@ -1,6 +1,44 @@
 FROM nginx:1.27-alpine
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY index.html /usr/share/nginx/html/index.html
+RUN cat <<'EOF' > /usr/share/nginx/html/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enterprise Appliance Status</title>
+  <style>
+    body { font-family: sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .card { background: #1e293b; padding: 2rem; border-radius: 8px; width: 420px; border: 1px solid #334155; }
+    .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: bold; background: #065f46; color: #34d399; }
+    pre { background: #0f172a; padding: 1rem; border-radius: 6px; color: #94a3b8; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2>Appliance Status</h2>
+      <span class="badge" id="badge">Connecting...</span>
+    </div>
+    <p>Host: On-Premise Appliance Stack</p>
+    <pre id="data">Loading API telemetry...</pre>
+  </div>
+  <script>
+    fetch('/api/status')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('badge').innerText = 'OPERATIONAL';
+        document.getElementById('data').innerText = JSON.stringify(data, null, 2);
+      })
+      .catch(err => {
+        document.getElementById('badge').style.background = '#7f1d1d';
+        document.getElementById('badge').style.color = '#f87171';
+        document.getElementById('badge').innerText = 'UNREACHABLE';
+        document.getElementById('data').innerText = err.toString();
+      });
+  </script>
+</body>
+</html>
+EOF
 EXPOSE 80
 CMD ["nginx","-g","daemon off;"]
 
